@@ -1,10 +1,19 @@
 export default {
   async fetch(request, env, ctx) {
+    // ✅ Step 1: IP restriction
+    const allowedIps = ["189.203.12.82"];
+    const ip = request.headers.get("CF-Connecting-IP");
+
+    if (!allowedIps.includes(ip)) {
+      return new Response("🚫 Access Denied", { status: 403 });
+    }
+
+    // ✅ Step 2: Your existing SPA / static asset logic
     const url = new URL(request.url);
     const pathname = url.pathname;
 
     try {
-      // First, try to get the asset from KV storage
+      // Try to get the asset from KV storage
       const response = await env.ASSETS.fetch(request);
       
       // If we get a successful response (not 404), return it
